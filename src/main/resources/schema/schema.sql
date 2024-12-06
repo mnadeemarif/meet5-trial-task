@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS users (
-                               user_id BIGINT PRIMARY KEY,
+                               user_id BIGINT PRIMARY KEY auto_increment,
                                username VARCHAR(50) NOT NULL UNIQUE,
                                email VARCHAR(100) NOT NULL UNIQUE,
                                first_name VARCHAR(50) NOT NULL,
@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE TABLE IF NOT EXISTS user_interactions (
-                                   interaction_id BIGINT PRIMARY KEY,
+                                   interaction_id BIGINT PRIMARY KEY auto_increment,
                                    source_user_id BIGINT REFERENCES users(user_id),
                                    target_user_id BIGINT REFERENCES users(user_id),
                                    interaction_type VARCHAR(20) CHECK (interaction_type IN ('VISIT', 'LIKE')),
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS user_interactions (
 );
 
 CREATE TABLE IF NOT EXISTS fraud_detection_log (
-                                     log_id BIGINT PRIMARY KEY,
+                                     log_id BIGINT PRIMARY KEY auto_increment,
                                      user_id BIGINT REFERENCES users(user_id),
                                      interaction_count INTEGER NOT NULL,
                                      interaction_window_start TIMESTAMP NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS fraud_detection_log (
                                      is_flagged BOOLEAN DEFAULT FALSE
 );
 
-CREATE INDEX idx_user_interactions_source ON user_interactions(source_user_id);
-CREATE INDEX idx_user_interactions_target ON user_interactions(target_user_id);
-CREATE INDEX idx_fraud_detection_user ON fraud_detection_log(user_id);
-CREATE INDEX idx_user_interactions_timestamp ON user_interactions(created_at);
+-- CREATE INDEX idx_user_interactions_source ON user_interactions(source_user_id);
+-- CREATE INDEX idx_user_interactions_target ON user_interactions(target_user_id);
+-- CREATE INDEX idx_fraud_detection_user ON fraud_detection_log(user_id);
+-- CREATE INDEX idx_user_interactions_timestamp ON user_interactions(created_at);
