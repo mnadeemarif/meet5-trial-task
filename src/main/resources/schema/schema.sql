@@ -18,9 +18,7 @@ CREATE TABLE IF NOT EXISTS meet5.user_interactions (
                                    interaction_type VARCHAR(20) not null CHECK (interaction_type IN ('VISIT', 'LIKE')),
                                    created_at timestamptz DEFAULT CURRENT_TIMESTAMP,
                                    modified_at timestamptz DEFAULT  CURRENT_TIMESTAMP
---                                    CONSTRAINT unique_interaction UNIQUE (source_user_id, target_user_id, interaction_type)
---                                 CONSTRAINT unique_interaction_like unique (source_user_id, target_user_id) where interaction_type = 'LIKE'
-    );
+);
 
 CREATE UNIQUE INDEX IF NOT EXISTS unique_interaction_like
     ON meet5.user_interactions (source_user_id, target_user_id)
@@ -29,9 +27,6 @@ CREATE UNIQUE INDEX IF NOT EXISTS unique_interaction_like
 CREATE TABLE IF NOT EXISTS meet5.fraud_detection_log (
                                      log_id SERIAL PRIMARY KEY,
                                      user_id BIGINT REFERENCES meet5.users(user_id),
-                                     -- interaction_count INTEGER NOT NULL,
-                                     -- interaction_window_start TIMESTAMP NOT NULL,
-                                     -- interaction_window_end TIMESTAMP NOT NULL,
                                      detected_at timestamptz DEFAULT CURRENT_TIMESTAMP,
                                      is_flagged BOOLEAN DEFAULT FALSE
 );

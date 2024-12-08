@@ -1,4 +1,4 @@
-package com.meet5.task.config;
+package com.meet5.task.controller;
 
 import com.meet5.task.exception.FraudulentActivityException;
 import lombok.extern.slf4j.Slf4j;
@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.Map;
 
-@Slf4j
 @org.springframework.web.bind.annotation.ControllerAdvice
+@Slf4j
 public class ControllerAdvice {
 
     @ExceptionHandler(IllegalArgumentException.class)
