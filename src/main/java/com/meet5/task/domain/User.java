@@ -1,22 +1,32 @@
 package com.meet5.task.domain;
 
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.jdbc.core.RowMapper;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.regex.Pattern;
 
+@Getter
 public class User implements Serializable {
-    private Long userId;
-    private String username;
+    @Setter
+    protected Long userId;
+    protected String username;
     private String email;
-    private String firstName;
-    private String lastName;
+    @Setter
+    protected String firstName;
+    @Setter
+    protected String lastName;
     private Integer age;
-    private final LocalDateTime createdAt;
+    @Setter
+    protected LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
+    @Setter
     private Date lastActiveAt;
-
     private static final int MIN_AGE = 13;
+
     private static final int MAX_AGE = 120;
     private static final Pattern EMAIL_PATTERN = Pattern.compile(
             "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$"
@@ -24,11 +34,6 @@ public class User implements Serializable {
     private static final Pattern USERNAME_PATTERN = Pattern.compile(
             "^[a-zA-Z0-9_.]{3,20}$"
     );
-
-    public User() {
-        this.createdAt = LocalDateTime.now();
-    }
-
     private void validateUsername(String username) {
         if (username == null || !USERNAME_PATTERN.matcher(username).matches()) {
             throw new IllegalArgumentException("Invalid username");
@@ -72,59 +77,19 @@ public class User implements Serializable {
         return createdAt.isAfter(LocalDateTime.now().minusDays(7));
     }
 
-    public Long getUserId() {
-        return this.userId;
-    }
-
-    public String getUsername() {
-        return this.username;
-    }
-
-    public String getEmail() {
-        return this.email;
-    }
-
-    public String getFirstName() {
-        return this.firstName;
-    }
-
-    public String getLastName() {
-        return this.lastName;
-    }
-
-    public Integer getAge() {
-        return this.age;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return this.createdAt;
-    }
-
-    public LocalDateTime getModifiedAt() {
-        return this.modifiedAt;
-    }
-
-    public Date getLastActiveAt() {
-        return this.lastActiveAt;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
     public void setModifiedAt(LocalDateTime modifiedAt) {
         this.modifiedAt = modifiedAt;
     }
 
-    public void setLastActiveAt(Date lastActiveAt) {
-        this.lastActiveAt = lastActiveAt;
-    }
+    public static final RowMapper<User> userRowMapper = (rs, rowNum) -> {
+        User user = new User();
+        user.setUserId(rs.getLong("user_id"));
+        user.setAge(rs.getInt("age"));
+        user.setEmail(rs.getString("email"));
+        user.setUsername(rs.getString("username"));
+        user.setFirstName(rs.getString("first_name"));
+        user.setLastName(rs.getString("last_name"));
+        user.setLastActiveAt(rs.getDate("last_active_at"));
+        return user;
+    };
 }

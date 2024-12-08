@@ -1,31 +1,48 @@
 package com.meet5.task.repository;
 
 import com.meet5.task.domain.User;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.meet5.task.domain.projection.Visitor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
+import static com.meet5.task.domain.User.userRowMapper;
+import static com.meet5.task.domain.projection.Visitor.visitorRowMapper;
+
 @Repository
+@RequiredArgsConstructor
 public class UserRepository {
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
-    public User findUserById (Integer userId) {
+    public User findUserById(Integer userId) {
         return jdbcTemplate.queryForObject("select * from users where user_id = ?", userRowMapper, userId);
     }
 
-    private final RowMapper<User> userRowMapper = (rs, rowNum) -> {
-        User user = new User();
-        user.setUserId(rs.getLong("user_id"));
-        user.setAge(rs.getInt("age"));
-        user.setEmail(rs.getString("email"));
-        user.setUsername(rs.getString("username"));
-        user.setFirstName(rs.getString("first_name"));
-        user.setLastName(rs.getString("last_name"));
-        user.setLastActiveAt(rs.getDate("last_active_at"));
-        return user;
-    };
+    public List<Visitor> findVisitorsByUserId (Integer userId) {
+        String query = """
+                SELECT up.user_id,up.username,up.first_name,up.last_name,up.created_at,
+                       COUNT(ui.interaction_id) AS visit_count,
+                       MAX(ui.created_at) AS last_visited_at
+                FROM
+                user_interactions ui
+                    JOIN
+                    users up ON ui.source_user_id = up.user_id
+                WHERE
+                    ui.target_user_id = ? AND ui.interaction_type = 'VISIT'
+                GROUP BY
+                    up.user_id,
+                    up.username,
+                    up.first_name,
+                    up.last_name
+                ORDER BY
+                    last_visited_at DESC,
+                    visit_count DESC
+                """;
 
+        return jdbcTemplate.query(query, visitorRowMapper,userId);
+    }
 }
